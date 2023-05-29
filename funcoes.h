@@ -1,0 +1,65 @@
+#include "openssl/crypto.h" //arquivo de definição necessário para SHA256_DIGEST_LENGTH
+#include "openssl/sha.h" 
+#include "mtwister.h"
+#include "string.h"
+#include <stdlib.h>
+
+
+#define MAX_BLOCO 5
+#define NUM_ENDERECO 256
+#define TOTAL_BLOCOS 3
+#define MAX_TRANSACAO 61
+
+struct BlocoNaoMinerado
+{
+  unsigned int numero;
+  unsigned int nonce;
+  unsigned char data[184];
+  unsigned char hashAnterior[SHA256_DIGEST_LENGTH];
+};
+typedef struct BlocoNaoMinerado BlocoNaoMinerado;
+
+typedef struct BlocoMinerado
+{
+  BlocoNaoMinerado bloco;
+  unsigned char hash[SHA256_DIGEST_LENGTH];
+  struct BlocoMinerado *prox;
+} BlocoMinerado;
+
+typedef struct CarteiraSistema{
+  unsigned int endereco[256];
+}CarteiraSistema;
+
+//cria uma lista para todas as pessoas que possuem bicotcoin, tamanho dela e uma ponteiro para o proximo nó
+typedef struct PossuiBitcoin{
+  unsigned char data;
+  unsigned int tam;
+  struct PossuiBitcoin *prox;
+}PossuiBitcoin;
+
+typedef struct Minerador
+{
+
+  struct Minerador *prox;
+}Minerador;
+
+
+typedef struct estatistica
+{
+  unsigned int minerou[256];
+  struct BlocoMinerado *BlocoMinerado;
+  struct PossuiBitcoin *Possui;
+  struct CarteiraSistema *MaisBitcoin;
+  struct CarteiraSistema *MaisMinerou;
+  unsigned char *HashMenosTransacao[SHA256_DIGEST_LENGTH];
+} estatistica;
+
+void printHash(unsigned char hash[], int length);
+void iniciarCarteira(CarteiraSistema *carteira);
+void IniciarTransacao(BlocoNaoMinerado *blN,MTRand *rand, estatistica *blockchain);
+void gerarBloco(estatistica *blockchain,CarteiraSistema *carteira);
+void imprimeBlockchain(BlocoMinerado *bloco);
+void CopiaHash();
+void minerar(BlocoNaoMinerado *blN, estatistica *blockchain);
+void Recompensa(BlocoNaoMinerado *blN, estatistica *blockchain);
+void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash);
