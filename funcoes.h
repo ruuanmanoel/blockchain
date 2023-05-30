@@ -7,7 +7,7 @@
 
 #define MAX_BLOCO 5
 #define NUM_ENDERECO 256
-#define TOTAL_BLOCOS 1
+#define TOTAL_BLOCOS 2
 #define MAX_TRANSACAO 62
 #define MAX_DATA 184
 #define RECOMPENSA 50
@@ -45,7 +45,7 @@ typedef struct estatistica
   struct BlocoMinerado *BlocoMinerado;
   struct PossuiBitcoin *Possui;
   CarteiraSistema *monitoraCarteira;
-  unsigned int tamListaPossui;
+  unsigned char tamListaPossui;
   unsigned char *HashMenosTransacao[SHA256_DIGEST_LENGTH];
 } estatistica;
 
@@ -60,6 +60,7 @@ void minerar(BlocoNaoMinerado *blN, estatistica *blockchain);
 void recompensa(estatistica *blockchain);
 void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao);
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash);
-int procuraEndereco(estatistica *blockchain,unsigned char endereco);
+unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco);
+void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand);
 void adicionaEndereco(estatistica *blockchain, unsigned char endereco);
 unsigned char buscaEndereco(unsigned char numero_sorteado, estatistica *blockchain);

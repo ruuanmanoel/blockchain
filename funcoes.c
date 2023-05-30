@@ -30,14 +30,14 @@ void adicionaEndereco(estatistica *blockchain, unsigned char endereco){
     possui->prox = blockchain->Possui;
     blockchain->Possui = possui;
 }
-int procuraEndereco(estatistica *blockchain,unsigned char endereco){
+unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
     PossuiBitcoin *aux = blockchain->Possui;
     while (aux != NULL)
     {
-        if(aux->data == endereco) return 1;
+        if(aux->data == endereco) return endereco;
         aux = aux->prox;
     }
-    return 0;
+    return NULL;
     
 }
 
@@ -85,10 +85,10 @@ void gerarBloco(estatistica *blockchain, CarteiraSistema *carteira){
             continue;      
         }else{
             memcpy(blN.hashAnterior, blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
-            blN.data[183] = genRandLong(&rand) % NUM_ENDERECO;
+            realizarTransacao(&blN,blockchain,&rand);
         }
-        minerar(&blN,blockchain);
-        recompensa(blockchain);
+        //minerar(&blN,blockchain);
+        //recompensa(blockchain);
             
         //----------fim das atribuições do bloco---------
         //IniciarTransacao(&blN,&rand,blockchain);   
@@ -104,6 +104,15 @@ void iniciaGenesis(BlocoNaoMinerado *blN,estatistica *blockchain, MTRand *rand){
     minerar(blN,blockchain);
     recompensa(blockchain);
 }
+void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand){
+    unsigned char tamanho_lista_bitcoin = blockchain->tamListaPossui; 
+    unsigned char numero_transacao = genRandLong(rand) % MAX_TRANSACAO;
+    for(unsigned char i = 0; i < numero_transacao; i++){
+        unsigned char sortear_endereco = genRandLong(rand) % tamanho_lista_bitcoin;
+        //unsigned char endereco_origem = 
+    }
+}
+
 void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
     unsigned char hash[SHA256_DIGEST_LENGTH];
     unsigned int nonce = 0;
@@ -120,13 +129,10 @@ void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned
         BlocoMinerado *bl = malloc(sizeof(BlocoMinerado));
         bl->bloco = *blN;
         memcpy(bl->hash,hash, sizeof(unsigned char)*SHA256_DIGEST_LENGTH);
-        //printHash(hash, SHA256_DIGEST_LENGTH);
         bl->prox =  blockchain->BlocoMinerado;
         blockchain->BlocoMinerado = bl;
         //printHash(blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
 }
-
-
 void recompensa(estatistica *blockchain){
    //definição de variaveis auxiliares
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
@@ -134,7 +140,7 @@ void recompensa(estatistica *blockchain){
     //atribuição da recompensa ao minerador
     *(carteira + minerador) += RECOMPENSA;
     //se o minerador não estiver na lista dos que possui bitcoin, adiciona ele.
-    if(procuraEndereco(blockchain,minerador) == 0){
+    if(procuraEndereco(blockchain,minerador) == NULL){
         adicionaEndereco(blockchain,minerador);
     }
 }
