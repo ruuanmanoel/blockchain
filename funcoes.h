@@ -8,7 +8,8 @@
 #define MAX_BLOCO 5
 #define NUM_ENDERECO 256
 #define TOTAL_BLOCOS 2
-#define MAX_TRANSACAO 61
+#define MAX_TRANSACAO 62
+#define MAX_DATA 184
 
 struct BlocoNaoMinerado
 {
@@ -42,15 +43,19 @@ typedef struct estatistica
   unsigned char Maior;
   struct BlocoMinerado *BlocoMinerado;
   struct PossuiBitcoin *Possui;
+  CarteiraSistema *monitoraCarteira;
   unsigned int tamListaPossui;
   unsigned char *HashMenosTransacao[SHA256_DIGEST_LENGTH];
 } estatistica;
 
 void printHash(unsigned char hash[], int length);
+void iniciarData(BlocoNaoMinerado *blN);
+void iniciaGenesis(BlocoNaoMinerado *blN);
 void iniciarCarteira(CarteiraSistema *carteira);
 void IniciarTransacao(BlocoNaoMinerado *blN,MTRand *rand, estatistica *blockchain);
 void gerarBloco(estatistica *blockchain,CarteiraSistema *carteira);
 void imprimeBlockchain(BlocoMinerado *bloco);
 void minerar(BlocoNaoMinerado *blN, estatistica *blockchain);
-void Recompensa(estatistica *blockchain, CarteiraSistema *carteira);
+void Recompensa(estatistica *blockchain);
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash);
+unsigned char buscaEndereco(unsigned char numero_sorteado, estatistica *blockchain);
