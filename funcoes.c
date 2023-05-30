@@ -16,10 +16,11 @@ void iniciarCarteira(CarteiraSistema *carteira){
     }
 }
 void IniciarTransacao(BlocoNaoMinerado *blN,MTRand *rand , estatistica *blockchain){
-    unsigned int NumeroTransacao = genRandLong(rand) % MAX_TRANSACAO;
-    unsigned char EnderecoOrigem = genRandLong(rand) % NUM_ENDERECO;
-    unsigned int ValorTransferencia = genRandLong(rand) % blockchain->Possui->tam;
+    //unsigned long int NumeroTransacao = genRandLong(rand) % MAX_TRANSACAO;
 
+    //printf("\n\n%lu\n\n", NumeroTransacao);
+    /*unsigned char EnderecoOrigem = genRandLong(rand) % blockchain->Possui->tam; 
+    unsigned int ValorTransferencia = genRandLong(rand) % MAX_TRANSACAO;*/
     for (size_t i = 0; i < 184; i++)
     {
         blN->data[i]=i;
@@ -46,23 +47,19 @@ void gerarBloco(estatistica *blockchain, CarteiraSistema *carteira){
             {
                 blN.data[i] = *(mensagem+i);
             }
-            
-
             for (int i=0; i< SHA256_DIGEST_LENGTH; ++i){
                 blN.hashAnterior[i] = 0;
             }
         }else{
-            //IniciarTransacao(&blN,&rand,blockchain);
+            IniciarTransacao(&blN,&rand,blockchain);
             memcpy(blN.hashAnterior, blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
             printHash(blN.hashAnterior, SHA256_DIGEST_LENGTH);
-        }
-            
-        endereco = blN.data[183] = genRandLong(&rand) % NUM_ENDERECO;
+        }         
+        blN.data[183] = genRandLong(&rand) % NUM_ENDERECO;
         //fim das atribuições de valores ao bloco
         minerar(&blN, blockchain);
-
-        //printHash(blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
-        carteira->endereco[endereco] +=50;      
+        Recompensa(blockchain,carteira);
+        //printHash(blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);    
         numero++;
     }
 }
@@ -77,25 +74,31 @@ void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
         } while(hash[0] != 0);
         printHash(hash, SHA256_DIGEST_LENGTH);
         CriarBlocoMinerado(blN,blockchain,hash);
-
 }
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash){
         BlocoMinerado *bl = malloc(sizeof(BlocoMinerado));
         bl->bloco = *blN;
         memcpy(bl->hash,hash, sizeof(unsigned char)*SHA256_DIGEST_LENGTH);
         //printHash(hash, SHA256_DIGEST_LENGTH);
-
         bl->prox =  blockchain->BlocoMinerado;
         blockchain->BlocoMinerado = bl;
         //printHash(blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
 }
-void Recompensa(BlocoNaoMinerado *blN, estatistica *blockchain){
-   
+void Recompensa(estatistica *blockchain, CarteiraSistema *carteira){
+    carteira->endereco[blockchain->BlocoMinerado->bloco.data[183]] =+50;
+    PossuiBitcoin *possui = malloc(sizeof(PossuiBitcoin));
+    possui->data = blockchain->BlocoMinerado->bloco.data[183];
+    blockchain->tamListaPossui++;
+    possui->prox = blockchain->Possui;
+    blockchain->Possui = possui;
+    static int i=0;
+   /* if(i>0){
+    printf("A lista possui %d elementos \nos mineradores %d e %d possui saldo\n", blockchain->tamListaPossui, blockchain->Possui->data, blockchain->Possui->prox->data);
+    }
+    i++;
+    */
 }
 
-void CopiaHash(){
-
-}
 void imprimeBlockchain(BlocoMinerado *bloco){
     if (bloco == NULL) return;
     while (bloco)
