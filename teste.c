@@ -9,4 +9,5 @@ int main()
   CarteiraSistema carteira;
   iniciarCarteira(&carteira);
   gerarBloco(blockchain,&carteira);  
+  free(blockchain);
 }

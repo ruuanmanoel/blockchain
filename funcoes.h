@@ -63,4 +63,4 @@ void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned
 unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco);
 void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand);
 void adicionaEndereco(estatistica *blockchain, unsigned char endereco);
-unsigned char buscaEndereco(unsigned char numero_sorteado, estatistica *blockchain);
+unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco);
