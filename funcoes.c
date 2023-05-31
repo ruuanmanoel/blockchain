@@ -20,6 +20,7 @@ void iniciarData(BlocoNaoMinerado *blN){
     }
 }
 void adicionaEndereco(estatistica *blockchain, unsigned char endereco){
+    if(blockchain == NULL)return;
     PossuiBitcoin *possui = malloc(sizeof(PossuiBitcoin));
     possui->data = endereco;
     blockchain->tamListaPossui++;
@@ -27,7 +28,7 @@ void adicionaEndereco(estatistica *blockchain, unsigned char endereco){
     blockchain->Possui = possui;
 }
 void removeEndereco(estatistica *blockchain, unsigned char endereco){
-    if(blockchain == NULL)return;
+    if(blockchain->Possui == NULL)return;
     PossuiBitcoin *aux = blockchain->Possui;
     PossuiBitcoin *anterior = NULL;
     if (aux != NULL && aux->data == endereco) {
@@ -47,6 +48,7 @@ void removeEndereco(estatistica *blockchain, unsigned char endereco){
     // Remove o item da lista
     anterior->prox = aux->prox;
     free(aux);
+    blockchain->tamListaPossui--;
     
 }
 unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
@@ -64,7 +66,7 @@ unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco){
     int n=0;
     while (n != endereco)
     {
-        if(aux->data == endereco)  break;
+        
         aux = aux->prox;
     }
     return aux->data;
@@ -74,8 +76,7 @@ void gerarBloco(estatistica *blockchain, CarteiraSistema *carteira){
     //inicializa os valores aleatores e o numero do bloco;
     MTRand rand = seedRand(1234567);
     blockchain->monitoraCarteira = carteira;
-    for (size_t i = 1; i <= TOTAL_BLOCOS; i++) 
-    {
+    for (size_t i = 1; i <= TOTAL_BLOCOS; i++){
         //definação das variaveveis atribui o numero do bloco se for maior que 1 ele copia o hash do bloco anterior
         BlocoNaoMinerado blN;
         blN.numero = i;
@@ -85,9 +86,9 @@ void gerarBloco(estatistica *blockchain, CarteiraSistema *carteira){
             continue;      
         }else{
             memcpy(blN.hashAnterior, blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
-            //printf("\n%d\n%d\n%d\n", blockchain->BlocoMinerado->bloco.numero, blockchain->BlocoMinerado->bloco.nonce,blockchain->BlocoMinerado->bloco.data[183]);
             //printHash(blN.hashAnterior,SHA256_DIGEST_LENGTH);
             realizarTransacao(&blN,blockchain,&rand);
+            
         }
     }
 }
@@ -121,7 +122,7 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
         *(carteira+endereco_origem) -=valor;
         
     }
-    blN->data[183] = genRandLong(rand) %NUM_ENDERECO;
+    blN->data[183] = genRandLong(rand) % NUM_ENDERECO;
     minerar(blN, blockchain);
     recompensa(blockchain);
     atualizarCarteira(blockchain,numero_transacao);
@@ -143,7 +144,7 @@ void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash){
         BlocoMinerado *bl = malloc(sizeof(BlocoMinerado));
         bl->bloco = *blN;
-        memcpy(bl->hash,hash, sizeof(unsigned char)*SHA256_DIGEST_LENGTH);
+        memcpy(bl->hash,hash, SHA256_DIGEST_LENGTH);
         bl->prox =  blockchain->BlocoMinerado;
         blockchain->BlocoMinerado = bl;
         //printHash(blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
@@ -168,10 +169,16 @@ void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao){
         endereco_origem = *(data_temporaria+i*3);
         endereco_destino = *(data_temporaria+i*3+1);
         valor = *(data_temporaria+i*3+2);
-        *(carteira + endereco_destino) = valor;
-        if(procuraEndereco(blockchain,endereco_destino)==1)adicionaEndereco(blockchain,endereco_destino);
-        if(endereco_origem <=0 )removeEndereco(blockchain,endereco_origem);
+        if(valor>0){
+            *(carteira + endereco_destino) += valor;
+            if(procuraEndereco(blockchain,endereco_destino)==1)adicionaEndereco(blockchain,endereco_destino);
+        }
+        if(*(carteira + endereco_origem) <=0 )removeEndereco(blockchain,endereco_origem);
+        printf("O endereco %d tem %d e doou %d para %d\n", endereco_origem, *(carteira + endereco_origem),valor,endereco_destino);
     }
+    imprimeLista(blockchain);
+    
+    
 }
 void imprimeBloco(estatistica *blockchain){
     BlocoMinerado *bl = blockchain->BlocoMinerado;
@@ -188,5 +195,21 @@ void imprimeBloco(estatistica *blockchain){
 }
 void imprimeBlockchain(estatistica *blockchain){
     if (blockchain == NULL) return;
-   
+    BlocoMinerado *aux = blockchain->BlocoMinerado;
+    while (aux != NULL)
+    {
+        printf("%d\n", aux->bloco.numero);
+        aux = aux->prox;
+    }
+    
+}
+void imprimeLista(estatistica *blockchain){
+    if(blockchain == NULL) return;
+    PossuiBitcoin *aux=blockchain->Possui;
+    while (aux != NULL)
+    {
+        printf("%d\n", aux->data);
+        aux = aux->prox;
+    }
+    
 }

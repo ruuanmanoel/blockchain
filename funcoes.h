@@ -7,7 +7,7 @@
 
 #define MAX_BLOCO 5
 #define NUM_ENDERECO 256
-#define TOTAL_BLOCOS 3
+#define TOTAL_BLOCOS 2
 #define MAX_TRANSACAO 62
 #define MAX_DATA 184
 #define RECOMPENSA 50
@@ -65,3 +65,4 @@ void adicionaEndereco(estatistica *blockchain, unsigned char endereco);
 unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco);
 void removeEndereco(estatistica *blockchain, unsigned char endereco);
 void imprimeBloco(estatistica *blockchain);
+void imprimeLista(estatistica *blockchain);
