@@ -2,12 +2,10 @@
 
 void printHash(unsigned char hash[], int length)
 {
-  int i;
-  for(i=0;i<length;++i)
-    printf("%02x", hash[i]);
-  printf("\n");
-
-  printf("\n");
+    int i;
+    for(i=0;i<length;++i)
+        printf("%02x", hash[i]);
+    printf("\n");
 }
 void iniciarCarteira(CarteiraSistema *carteira){
     if(carteira == NULL)return;
@@ -33,7 +31,7 @@ void removeEndereco(estatistica *blockchain, unsigned char endereco){
     PossuiBitcoin *aux = blockchain->Possui;
     PossuiBitcoin *anterior = NULL;
     if (aux != NULL && aux->data == endereco) {
-        blockchain = aux->prox;
+        blockchain->Possui = aux->prox;
         free(aux);
         return;
     }
@@ -41,7 +39,7 @@ void removeEndereco(estatistica *blockchain, unsigned char endereco){
     {
         anterior = aux;
         aux = aux->prox;
-    }
+    }  
     if (aux == NULL) {
         return;
     }
@@ -102,6 +100,8 @@ void iniciaGenesis(BlocoNaoMinerado *blN,estatistica *blockchain, MTRand *rand){
     }
     minerar(blN,blockchain);
     recompensa(blockchain);
+    imprimeBloco(blockchain);
+
 }
 void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand){
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
@@ -125,6 +125,7 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
     minerar(blN, blockchain);
     recompensa(blockchain);
     atualizarCarteira(blockchain,numero_transacao);
+    imprimeBloco(blockchain);
 }
 
 void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
@@ -136,7 +137,7 @@ void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
         SHA256((unsigned char*)blN, sizeof(BlocoNaoMinerado), hash);
         nonce++;
     }while(hash[0] != 0);
-    printHash(hash, SHA256_DIGEST_LENGTH);
+    //printHash(hash, SHA256_DIGEST_LENGTH);
     CriarBlocoMinerado(blN,blockchain,hash);
 }
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash){
@@ -168,17 +169,24 @@ void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao){
         endereco_destino = *(data_temporaria+i*3+1);
         valor = *(data_temporaria+i*3+2);
         *(carteira + endereco_destino) = valor;
-        if(procuraEndereco(blockchain,endereco_destino)==NULL)adicionaEndereco(blockchain,endereco_destino);
-
-        //if(endereco_origem <=0 )removeEndereco();
-
+        if(procuraEndereco(blockchain,endereco_destino)==1)adicionaEndereco(blockchain,endereco_destino);
+        if(endereco_origem <=0 )removeEndereco(blockchain,endereco_origem);
     }
 }
-void imprimeBlockchain(BlocoMinerado *bloco){
-    if (bloco == NULL) return;
-    while (bloco)
-    {
-       printf("%d", bloco->bloco.numero);
-       bloco = bloco->prox;
-    }   
+void imprimeBloco(estatistica *blockchain){
+    BlocoMinerado *bl = blockchain->BlocoMinerado;
+    printf("\n----------------------------------------\n");
+    printf("Bloco #0%d\n", bl->bloco.numero);
+    printf("Nonce #%d\n", bl->bloco.nonce);
+    printf("Hash anterior ");
+    printHash(bl->bloco.hashAnterior,SHA256_DIGEST_LENGTH);
+    printf("Hash Atual ");
+    printHash(bl->hash,SHA256_DIGEST_LENGTH);
+    printf("Minerador #%d\n", bl->bloco.data[183]);
+    printf("\n----------------------------------------\n");
+    
+}
+void imprimeBlockchain(estatistica *blockchain){
+    if (blockchain == NULL) return;
+   
 }
