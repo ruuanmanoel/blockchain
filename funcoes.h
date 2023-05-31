@@ -64,3 +64,4 @@ unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco);
 void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand);
 void adicionaEndereco(estatistica *blockchain, unsigned char endereco);
 unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco);
+void removeEndereco(estatistica *blockchain, unsigned char endereco);
