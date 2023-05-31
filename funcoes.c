@@ -23,10 +23,11 @@ void adicionaEndereco(estatistica *blockchain, unsigned char endereco){
     if(blockchain == NULL)return;
     PossuiBitcoin *possui = malloc(sizeof(PossuiBitcoin));
     possui->data = endereco;
-    blockchain->tamListaPossui++;
+    blockchain->tamListaPossui+=1;
     possui->prox = blockchain->Possui;
     blockchain->Possui = possui;
 }
+
 void removeEndereco(estatistica *blockchain, unsigned char endereco){
     if(blockchain->Possui == NULL)return;
     PossuiBitcoin *aux = blockchain->Possui;
@@ -48,7 +49,7 @@ void removeEndereco(estatistica *blockchain, unsigned char endereco){
     // Remove o item da lista
     anterior->prox = aux->prox;
     free(aux);
-    blockchain->tamListaPossui--;
+    blockchain->tamListaPossui-=1;
     
 }
 unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
@@ -63,12 +64,14 @@ unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
 }
 unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco){
     PossuiBitcoin *aux = blockchain->Possui;
-    int n=0;
-    while (n != endereco)
+    if(endereco == 0)return aux->data;
+
+    while (aux->prox != NULL && aux->data != endereco)
     {
-        
         aux = aux->prox;
     }
+    
+    
     return aux->data;
 }
 
@@ -105,11 +108,12 @@ void iniciaGenesis(BlocoNaoMinerado *blN,estatistica *blockchain, MTRand *rand){
 
 }
 void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand){
+   
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
     unsigned char numero_transacao = genRandLong(rand) % MAX_TRANSACAO;
     for(unsigned char i = 0; i < numero_transacao; i++){
         unsigned char sortear_endereco = genRandLong(rand) % blockchain->tamListaPossui;
-        unsigned char endereco_origem =  buscaEndereco(blockchain,0);
+        unsigned char endereco_origem =  buscaEndereco(blockchain,sortear_endereco);
         unsigned char endereco_destino = endereco_origem;
         while (endereco_origem == endereco_destino) endereco_destino = genRandLong(rand) % NUM_ENDERECO;
         unsigned int valor = *(carteira+endereco_origem) == 0 ? 0 : 
@@ -126,6 +130,8 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
     recompensa(blockchain);
     atualizarCarteira(blockchain,numero_transacao);
     imprimeBloco(blockchain);
+     
+    
 }
 
 void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
@@ -173,7 +179,7 @@ void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao){
             if(procuraEndereco(blockchain,endereco_destino)==1)adicionaEndereco(blockchain,endereco_destino);
         }
         if(*(carteira + endereco_origem) <=0 )removeEndereco(blockchain,endereco_origem);
-       // printf("O endereco %d tem %d e doou %d para %d\n", endereco_origem, *(carteira + endereco_origem),valor,endereco_destino);
+       //printf("O endereco %d tem %d e doou %d para %d\n", endereco_origem, *(carteira + endereco_origem),valor,endereco_destino);
     }
     //imprimeLista(blockchain);
     

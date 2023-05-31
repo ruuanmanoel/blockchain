@@ -2,6 +2,7 @@
 
 int main()
 {
+  //FALTA LIBERAR OS MALLOC FEITOS
   estatistica *blockchain = malloc(sizeof(estatistica));
   blockchain->BlocoMinerado=NULL;
   blockchain->Possui=NULL;
