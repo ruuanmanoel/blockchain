@@ -22,13 +22,34 @@ void iniciarData(BlocoNaoMinerado *blN){
     }
 }
 void adicionaEndereco(estatistica *blockchain, unsigned char endereco){
-    
-
     PossuiBitcoin *possui = malloc(sizeof(PossuiBitcoin));
     possui->data = endereco;
     blockchain->tamListaPossui++;
     possui->prox = blockchain->Possui;
     blockchain->Possui = possui;
+}
+void removeEndereco(estatistica *blockchain, unsigned char endereco){
+    if(blockchain == NULL)return;
+    PossuiBitcoin *aux = blockchain->Possui;
+    PossuiBitcoin *anterior = NULL;
+    if (aux != NULL && aux->data == endereco) {
+        blockchain = aux->prox;
+        free(aux);
+        return;
+    }
+    while (aux != NULL && aux->data != endereco )
+    {
+        anterior = aux;
+        aux = aux->prox;
+    }
+    if (aux == NULL) {
+        return;
+    }
+
+    // Remove o item da lista
+    anterior->prox = aux->prox;
+    free(aux);
+    
 }
 unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
     PossuiBitcoin *aux = blockchain->Possui;
@@ -139,9 +160,18 @@ void recompensa(estatistica *blockchain){
 }
 void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao){
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
-    unsigned char data_temporaria = blockchain->BlocoMinerado->bloco.data;
+    unsigned char *data_temporaria = blockchain->BlocoMinerado->bloco.data;
+    unsigned char endereco_origem, endereco_destino;
+    unsigned int valor;
     for(int i=0; i<numeroTransacao; i++){
-        if( *(carteira + (data_temporaria)) <= 0);
+        endereco_origem = *(data_temporaria+i*3);
+        endereco_destino = *(data_temporaria+i*3+1);
+        valor = *(data_temporaria+i*3+2);
+        *(carteira + endereco_destino) = valor;
+        if(procuraEndereco(blockchain,endereco_destino)==NULL)adicionaEndereco(blockchain,endereco_destino);
+
+        //if(endereco_origem <=0 )removeEndereco();
+
     }
 }
 void imprimeBlockchain(BlocoMinerado *bloco){
