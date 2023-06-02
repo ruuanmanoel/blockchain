@@ -111,15 +111,14 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
    
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
     unsigned char numero_transacao = genRandLong(rand) % MAX_TRANSACAO;
-   /*  printf("LISTA POSSUI %d\n", blockchain->Possui->data); */
     if(blockchain->maior_transacao < numero_transacao) blockchain->maior_transacao = numero_transacao;
     for(unsigned char i = 0; i < numero_transacao; i++){
         unsigned char sortear_endereco = genRandLong(rand) % blockchain->tamListaPossui;
         unsigned char endereco_origem =  buscaEndereco(blockchain,sortear_endereco);
         unsigned char endereco_destino = endereco_origem;
-        while (endereco_origem == endereco_destino) endereco_destino = genRandLong(rand) % NUM_ENDERECO;
-        unsigned int valor = *(carteira+endereco_origem) == 0 ? 0 : 
-            genRandLong(rand) % *(carteira+endereco_origem)+1;
+        while (endereco_origem == endereco_destino)endereco_destino = genRandLong(rand) % NUM_ENDERECO;
+        unsigned int valor = *(carteira+endereco_origem)+1 == 0 ? 0 : 
+            genRandLong(rand) % (*(carteira+endereco_origem)+1);
         blN->data[i*3] = endereco_origem;
         blN->data[i*3+1] = endereco_destino;
         blN->data[i*3+2] = valor;

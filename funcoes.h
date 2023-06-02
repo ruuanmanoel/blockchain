@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #define NUM_ENDERECO 256
-#define TOTAL_BLOCOS 130
+#define TOTAL_BLOCOS 1000
 #define MAX_TRANSACAO 62
 #define MAX_DATA 184
 #define RECOMPENSA 50
