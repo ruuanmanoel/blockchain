@@ -270,11 +270,37 @@ void imprimeMaisMinerou(estatistica blockchain){
 
 }
 void imprimeBlocoMaiorTransacao(estatistica blockchain){
+    BlocoMinerado *bl = blockchain.BlocoMinerado;
    for(int i =0; i < TOTAL_BLOCOS; i++){
-    if(blockchain.maior_transacao);
+    printf("%02x",*bl->hash);
    }
     
 }
 void mediaBitcoin(estatistica blockchain){
     printf("%.2f", (blockchain.numero_medio_bitcoin / (TOTAL_BLOCOS - INCREMENTO)));
+}
+void inicializaBlockchain(estatistica *blockchain){
+    blockchain->BlocoMinerado = NULL;
+    blockchain->tamListaPossui = 0;
+    blockchain->Possui = NULL;
+    blockchain->monitoraCarteira = NULL;
+    blockchain->numero_medio_bitcoin = 0;
+    memset(blockchain->minerou_mais_bloco, 0, sizeof(blockchain->minerou_mais_bloco));
+}
+void liberaBlockchain(estatistica *blockchain){
+    BlocoMinerado *aux_blN = blockchain->BlocoMinerado;
+    while(aux_blN != NULL){
+        blockchain->BlocoMinerado = blockchain->BlocoMinerado->prox;
+        free(aux_blN);
+        aux_blN = blockchain->BlocoMinerado;
+    }
+    PossuiBitcoin *aux_possui = blockchain->Possui;
+    while (aux_possui != NULL)
+    {
+        blockchain->Possui = blockchain->Possui->prox;
+        free(aux_possui);
+        aux_possui = blockchain->Possui;
+    }
+    free(blockchain);   
+    blockchain = NULL;
 }

@@ -2,18 +2,15 @@
 
 int main()
 {
-  //FALTA LIBERAR OS MALLOC FEITOS
-  int escolha;
+  unsigned char escolha;
   estatistica *blockchain = malloc(sizeof(estatistica));
-  blockchain->BlocoMinerado=NULL;
-  memset(blockchain->minerou_mais_bloco, 0, sizeof(blockchain->minerou_mais_bloco));
-  blockchain->Possui=NULL;
-  blockchain->tamListaPossui = 0;
-  blockchain->numero_medio_bitcoin =0;
+  inicializaBlockchain(blockchain);
   CarteiraSistema carteira;
   iniciarCarteira(&carteira);
   gerarBloco(blockchain,&carteira);  
 
+  printf("Escolha uma das opções abaixo: ");
+  scanf("%c",&escolha);
   switch (escolha)
   {
     case 'a':
@@ -21,6 +18,9 @@ int main()
       break;
     case 'b':
       imprimeMaisMinerou(*blockchain);
+      break;
+    case 'c':
+      imprimeBlocoMaiorTransacao(*blockchain);
       break;
     case 'e':
       mediaBitcoin(*blockchain);
@@ -39,5 +39,5 @@ int main()
     }
   } */
   
-  //liberaBlockchain(&blockchain);
+  liberaBlockchain(blockchain);
 }

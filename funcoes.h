@@ -2,6 +2,7 @@
 #include "openssl/sha.h" 
 #include "mtwister.h"
 #include "string.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 #define NUM_ENDERECO 256
@@ -70,4 +71,7 @@ void imprimeBloco(estatistica *blockchain);
 void imprimeLista(estatistica *blockchain);
 void imprimeMaisBitcoin(estatistica blockcahin);
 void imprimeBloco(estatistica *blockchain);
+void imprimeBlocoMaiorTransacao(estatistica blockchain);
 void imprimeMaisMinerou(estatistica blockchain);
+void inicializaBlockchain(estatistica *blockchain);
+void liberaBlockchain(estatistica *blockchain);
