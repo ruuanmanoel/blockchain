@@ -107,6 +107,7 @@ void iniciaGenesis(BlocoNaoMinerado *blN,estatistica *blockchain, MTRand *rand){
     imprimeBloco(blockchain);
 
 }
+
 void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand){
    
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
@@ -123,8 +124,11 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
         blN->data[i*3+2] = valor;
         //printf("ele tem %d na carteira e deu %d\n", *(carteira+endereco_origem),valor);
         *(carteira+endereco_origem) -=valor;
-        
+        printf("VALOR : %d\n", valor);
+
+        blockchain->numero_medio_bitcoin +=valor;
     }
+    printf("NUM TRANSACAO : %d\n", numero_transacao);
     blN->data[183] = genRandLong(rand) % NUM_ENDERECO;
     minerar(blN, blockchain);
     recompensa(blockchain);
@@ -132,6 +136,9 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
     imprimeBloco(blockchain);
      
     
+}
+void mediaBitcoin(estatistica *blockchain){
+    printf("%.2f", (blockchain->numero_medio_bitcoin / (TOTAL_BLOCOS - INCREMENTO)));
 }
 
 void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
@@ -217,4 +224,32 @@ void imprimeLista(estatistica *blockchain){
         aux = aux->prox;
     }
     
+}
+
+void imprimeMaisBitcoin(estatistica blockchain){
+    //anda apenas pela lista das pessoas que tem bitcoin e imprime o maior valor junto com os endereçoes
+    PossuiBitcoin *endereco_com_bitcoin = blockchain.Possui;
+    unsigned int *carteira = blockchain.monitoraCarteira->endereco;
+    unsigned int maior_valor = *(blockchain.monitoraCarteira->endereco);
+    while (endereco_com_bitcoin)
+    {
+        if(*(carteira + endereco_com_bitcoin->data) > maior_valor)
+            maior_valor = *(carteira + endereco_com_bitcoin->data);
+        
+       endereco_com_bitcoin = endereco_com_bitcoin->prox;
+    }
+    
+    endereco_com_bitcoin = blockchain.Possui;
+    printf("\n------------------MAIOR VALOR--------------------");
+    printf("O maior valor eh %d:\n ", maior_valor);
+    while (endereco_com_bitcoin)
+    {
+        if(*(carteira + endereco_com_bitcoin->data) == maior_valor){
+            printf("\nO(s) endereco(s) com maior bitcoin eh/sao:%d", 
+                endereco_com_bitcoin->data);
+        }
+            endereco_com_bitcoin = endereco_com_bitcoin->prox;
+
+    }
+    printf("\n------------------MAIOR VALOR--------------------");
 }

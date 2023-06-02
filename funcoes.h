@@ -4,10 +4,8 @@
 #include "string.h"
 #include <stdlib.h>
 
-
-#define MAX_BLOCO 5
 #define NUM_ENDERECO 256
-#define TOTAL_BLOCOS 1000
+#define TOTAL_BLOCOS 4
 #define MAX_TRANSACAO 62
 #define MAX_DATA 184
 #define RECOMPENSA 50
@@ -42,6 +40,7 @@ typedef struct PossuiBitcoin{
 typedef struct estatistica
 {
   unsigned char Maior;
+  float numero_medio_bitcoin;
   struct BlocoMinerado *BlocoMinerado;
   struct PossuiBitcoin *Possui;
   CarteiraSistema *monitoraCarteira;
@@ -50,6 +49,7 @@ typedef struct estatistica
 } estatistica;
 
 void printHash(unsigned char hash[], int length);
+void mediaBitcoin(estatistica *blockchain);
 void iniciarData(BlocoNaoMinerado *blN);
 void iniciaGenesis(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand);
 void iniciarCarteira(CarteiraSistema *carteira);
@@ -67,3 +67,5 @@ unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco);
 void removeEndereco(estatistica *blockchain, unsigned char endereco);
 void imprimeBloco(estatistica *blockchain);
 void imprimeLista(estatistica *blockchain);
+void imprimeMaisBitcoin(estatistica blockcahin);
+void imprimeBloco(estatistica *blockchain);
