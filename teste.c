@@ -6,6 +6,7 @@ int main()
   int escolha;
   estatistica *blockchain = malloc(sizeof(estatistica));
   blockchain->BlocoMinerado=NULL;
+  memset(blockchain->minerou_mais_bloco, 0, sizeof(blockchain->minerou_mais_bloco));
   blockchain->Possui=NULL;
   blockchain->tamListaPossui = 0;
   blockchain->numero_medio_bitcoin =0;
@@ -15,22 +16,28 @@ int main()
 
   switch (escolha)
   {
-  case 'a':
-    printf("Endereço com mais bitcoin %d com %d bitcoin ");
-    break;
+    case 'a':
+      imprimeMaisBitcoin(*blockchain);
+      break;
+    case 'b':
+      imprimeMaisMinerou(*blockchain);
+      break;
+    case 'e':
+      mediaBitcoin(*blockchain);
+      break;
   
   default:
     break;
   }
-  mediaBitcoin(blockchain);
-  imprimeMaisBitcoin(*blockchain);  
-  for (size_t i = 0; i < 255; i++)
+  
+  
+  /* for (size_t i = 0; i < 255; i++)
   {
     if(carteira.endereco[i] > 0){
     printf("endereco %d possxui %d bitcoin: \n ", i, carteira.endereco[i] );
 
     }
-  }
+  } */
   
   //liberaBlockchain(&blockchain);
 }

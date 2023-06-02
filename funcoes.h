@@ -39,8 +39,9 @@ typedef struct PossuiBitcoin{
 
 typedef struct estatistica
 {
-  unsigned char Maior;
+  unsigned int minerou_mais_bloco[256];
   float numero_medio_bitcoin;
+  unsigned char maior_transacao;
   struct BlocoMinerado *BlocoMinerado;
   struct PossuiBitcoin *Possui;
   CarteiraSistema *monitoraCarteira;
@@ -49,7 +50,7 @@ typedef struct estatistica
 } estatistica;
 
 void printHash(unsigned char hash[], int length);
-void mediaBitcoin(estatistica *blockchain);
+void mediaBitcoin(estatistica blockchain);
 void iniciarData(BlocoNaoMinerado *blN);
 void iniciaGenesis(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand);
 void iniciarCarteira(CarteiraSistema *carteira);
@@ -69,3 +70,4 @@ void imprimeBloco(estatistica *blockchain);
 void imprimeLista(estatistica *blockchain);
 void imprimeMaisBitcoin(estatistica blockcahin);
 void imprimeBloco(estatistica *blockchain);
+void imprimeMaisMinerou(estatistica blockchain);

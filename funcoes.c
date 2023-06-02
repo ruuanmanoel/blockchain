@@ -112,6 +112,7 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
    
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
     unsigned char numero_transacao = genRandLong(rand) % MAX_TRANSACAO;
+    if(blockchain->maior_transacao < numero_transacao) blockchain->maior_transacao = numero_transacao;
     for(unsigned char i = 0; i < numero_transacao; i++){
         unsigned char sortear_endereco = genRandLong(rand) % blockchain->tamListaPossui;
         unsigned char endereco_origem =  buscaEndereco(blockchain,sortear_endereco);
@@ -124,11 +125,10 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
         blN->data[i*3+2] = valor;
         //printf("ele tem %d na carteira e deu %d\n", *(carteira+endereco_origem),valor);
         *(carteira+endereco_origem) -=valor;
-        printf("VALOR : %d\n", valor);
 
         blockchain->numero_medio_bitcoin +=valor;
     }
-    printf("NUM TRANSACAO : %d\n", numero_transacao);
+    
     blN->data[183] = genRandLong(rand) % NUM_ENDERECO;
     minerar(blN, blockchain);
     recompensa(blockchain);
@@ -136,9 +136,6 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
     imprimeBloco(blockchain);
      
     
-}
-void mediaBitcoin(estatistica *blockchain){
-    printf("%.2f", (blockchain->numero_medio_bitcoin / (TOTAL_BLOCOS - INCREMENTO)));
 }
 
 void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
@@ -171,6 +168,7 @@ void recompensa(estatistica *blockchain){
     if(procuraEndereco(blockchain,minerador) == 1){
         adicionaEndereco(blockchain,minerador);
     }
+    blockchain->minerou_mais_bloco[minerador]++;
 }
 void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao){
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
@@ -241,7 +239,7 @@ void imprimeMaisBitcoin(estatistica blockchain){
     
     endereco_com_bitcoin = blockchain.Possui;
     printf("\n------------------MAIOR VALOR--------------------");
-    printf("O maior valor eh %d:\n ", maior_valor);
+    printf("\nO maior valor eh %d:", maior_valor);
     while (endereco_com_bitcoin)
     {
         if(*(carteira + endereco_com_bitcoin->data) == maior_valor){
@@ -251,5 +249,32 @@ void imprimeMaisBitcoin(estatistica blockchain){
             endereco_com_bitcoin = endereco_com_bitcoin->prox;
 
     }
-    printf("\n------------------MAIOR VALOR--------------------");
+    printf("\n------------------FIM-----------------------------\n");
+}
+
+void imprimeMaisMinerou(estatistica blockchain){
+    
+    unsigned int maior_quantidade = 0;
+    for(int i =0; i<NUM_ENDERECO; i++){
+        if(blockchain.minerou_mais_bloco[i]> maior_quantidade)
+            maior_quantidade = blockchain.minerou_mais_bloco[i];
+    } 
+    printf("--------------OS MAIORES MINERADORES--------------\n");
+    for(int i = 0; i<NUM_ENDERECO; i++){
+        if(maior_quantidade == blockchain.minerou_mais_bloco[i]){
+            printf("O(s) endereco(s) que mais minerou foi:%d \n", i);
+        }
+    }
+    printf("O maior numero de mineracao eh: %d", maior_quantidade);
+    printf("\n------------------FIM----------------------------\n");
+
+}
+void imprimeBlocoMaiorTransacao(estatistica blockchain){
+   for(int i =0; i < TOTAL_BLOCOS; i++){
+    if(blockchain.maior_transacao);
+   }
+    
+}
+void mediaBitcoin(estatistica blockchain){
+    printf("%.2f", (blockchain.numero_medio_bitcoin / (TOTAL_BLOCOS - INCREMENTO)));
 }
