@@ -2,6 +2,10 @@
     "files.associations": {
         "time.h": "c",
         "funcoes.h": "c",
-        "crypto.h": "c"
+        "crypto.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "span": "c"
     }
 }

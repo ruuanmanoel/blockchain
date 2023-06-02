@@ -6,11 +6,11 @@
 #include <stdlib.h>
 
 #define NUM_ENDERECO 256
-#define TOTAL_BLOCOS 4
+#define TOTAL_BLOCOS 130
 #define MAX_TRANSACAO 62
 #define MAX_DATA 184
 #define RECOMPENSA 50
-#define INCREMENTO 1
+#define CALCULA_TRANSACAO bl.bloco.data[i* 3 ] ==0 && bl.bloco.data[i*3+1]  ==0 &&bl.bloco.data[i*3+2]  ==0
 
 struct BlocoNaoMinerado
 {
@@ -43,13 +43,14 @@ typedef struct estatistica
   unsigned int minerou_mais_bloco[256];
   float numero_medio_bitcoin;
   unsigned char maior_transacao;
+  unsigned char menor_transacao;
   struct BlocoMinerado *BlocoMinerado;
   struct PossuiBitcoin *Possui;
   CarteiraSistema *monitoraCarteira;
   unsigned char tamListaPossui;
   unsigned char *HashMenosTransacao[SHA256_DIGEST_LENGTH];
 } estatistica;
-
+estatistica* criaBlockchain();
 void printHash(unsigned char hash[], int length);
 void mediaBitcoin(estatistica blockchain);
 void iniciarData(BlocoNaoMinerado *blN);
@@ -62,7 +63,7 @@ void minerar(BlocoNaoMinerado *blN, estatistica *blockchain);
 void recompensa(estatistica *blockchain);
 void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao);
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash);
-unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco);
+int procuraEndereco(estatistica *blockchain,unsigned char endereco);
 void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *rand);
 void adicionaEndereco(estatistica *blockchain, unsigned char endereco);
 unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco);
@@ -75,3 +76,5 @@ void imprimeBlocoMaiorTransacao(estatistica blockchain);
 void imprimeMaisMinerou(estatistica blockchain);
 void inicializaBlockchain(estatistica *blockchain);
 void liberaBlockchain(estatistica *blockchain);
+
+int contaTransacao(BlocoMinerado bl);

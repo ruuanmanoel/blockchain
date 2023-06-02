@@ -23,9 +23,10 @@ void adicionaEndereco(estatistica *blockchain, unsigned char endereco){
     if(blockchain == NULL)return;
     PossuiBitcoin *possui = malloc(sizeof(PossuiBitcoin));
     possui->data = endereco;
-    blockchain->tamListaPossui+=1;
-    possui->prox = blockchain->Possui;
+    if(blockchain->Possui == NULL) possui->prox = NULL;
+    else possui->prox = blockchain->Possui;
     blockchain->Possui = possui;
+    blockchain->tamListaPossui+=1;
 }
 
 void removeEndereco(estatistica *blockchain, unsigned char endereco){
@@ -48,11 +49,11 @@ void removeEndereco(estatistica *blockchain, unsigned char endereco){
 
     // Remove o item da lista
     anterior->prox = aux->prox;
+    blockchain->tamListaPossui--;
     free(aux);
-    blockchain->tamListaPossui-=1;
     
 }
-unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
+int procuraEndereco(estatistica *blockchain,unsigned char endereco){
     PossuiBitcoin *aux = blockchain->Possui;
     while (aux != NULL)
     {
@@ -60,18 +61,16 @@ unsigned char procuraEndereco(estatistica *blockchain,unsigned char endereco){
         aux = aux->prox;
     }
     return 1;
-    
 }
 unsigned char buscaEndereco(estatistica *blockchain, unsigned char endereco){
     PossuiBitcoin *aux = blockchain->Possui;
-    if(endereco == 0)return aux->data;
+    int enderecoEncontrado = 0;
 
-    while (aux->prox != NULL && aux->data != endereco)
+    while (enderecoEncontrado != endereco)
     {
         aux = aux->prox;
+        enderecoEncontrado++;
     }
-    
-    
     return aux->data;
 }
 
@@ -112,6 +111,7 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
    
     unsigned int *carteira = blockchain->monitoraCarteira->endereco;
     unsigned char numero_transacao = genRandLong(rand) % MAX_TRANSACAO;
+   /*  printf("LISTA POSSUI %d\n", blockchain->Possui->data); */
     if(blockchain->maior_transacao < numero_transacao) blockchain->maior_transacao = numero_transacao;
     for(unsigned char i = 0; i < numero_transacao; i++){
         unsigned char sortear_endereco = genRandLong(rand) % blockchain->tamListaPossui;
@@ -123,9 +123,7 @@ void realizarTransacao(BlocoNaoMinerado *blN, estatistica *blockchain, MTRand *r
         blN->data[i*3] = endereco_origem;
         blN->data[i*3+1] = endereco_destino;
         blN->data[i*3+2] = valor;
-        //printf("ele tem %d na carteira e deu %d\n", *(carteira+endereco_origem),valor);
         *(carteira+endereco_origem) -=valor;
-
         blockchain->numero_medio_bitcoin +=valor;
     }
     
@@ -151,12 +149,18 @@ void minerar(BlocoNaoMinerado *blN, estatistica *blockchain){
     CriarBlocoMinerado(blN,blockchain,hash);
 }
 void CriarBlocoMinerado(BlocoNaoMinerado *blN, estatistica *blockchain, unsigned char *hash){
+        if(blockchain == NULL) return;
         BlocoMinerado *bl = malloc(sizeof(BlocoMinerado));
+        if(bl == NULL) return;
         bl->bloco = *blN;
         memcpy(bl->hash,hash, SHA256_DIGEST_LENGTH);
-        bl->prox =  blockchain->BlocoMinerado;
+        if(blockchain->BlocoMinerado == NULL){
+            bl->prox =  bl;
+        }else{
+            bl->prox = blockchain->BlocoMinerado->prox;
+            blockchain->BlocoMinerado->prox = bl;
+        }
         blockchain->BlocoMinerado = bl;
-        //printHash(blockchain->BlocoMinerado->hash, SHA256_DIGEST_LENGTH);
 }
 void recompensa(estatistica *blockchain){
    //definição de variaveis auxiliares
@@ -181,13 +185,40 @@ void atualizarCarteira(estatistica *blockchain, unsigned char numeroTransacao){
         valor = *(data_temporaria+i*3+2);
         if(valor>0){
             *(carteira + endereco_destino) += valor;
-            if(procuraEndereco(blockchain,endereco_destino)==1)adicionaEndereco(blockchain,endereco_destino);
+            //if(procuraEndereco(blockchain,endereco_destino)==1)adicionaEndereco(blockchain,endereco_destino);
         }
-        if(*(carteira + endereco_origem) <=0 )removeEndereco(blockchain,endereco_origem);
-       //printf("O endereco %d tem %d e doou %d para %d\n", endereco_origem, *(carteira + endereco_origem),valor,endereco_destino);
+    }
+    for (int i = 0; i < NUM_ENDERECO; i++)
+    {
+        if(*(carteira + i) > 0 ){
+            if(procuraEndereco(blockchain, i) ==1) adicionaEndereco(blockchain,i);
+        }
+    }
+    
+    for(int i =0; i<NUM_ENDERECO; i++){
+        if(*(carteira + i) <=0 )removeEndereco(blockchain,i);
     }
     //imprimeLista(blockchain);
     
+    
+}
+int contaTransacao(BlocoMinerado bl){
+    unsigned int contador =0;
+    for (int i = 1; i < MAX_TRANSACAO; i++)
+    {
+        
+        contador++;
+        if(CALCULA_TRANSACAO){ break;}
+        
+
+    }
+    return contador;
+}
+estatistica* criaBlockchain(){
+    estatistica *blockchain = malloc(sizeof(estatistica));
+    if(blockchain)
+        return blockchain;
+    return NULL;
     
 }
 void imprimeBloco(estatistica *blockchain){
@@ -200,6 +231,8 @@ void imprimeBloco(estatistica *blockchain){
     printf("Hash Atual ");
     printHash(bl->hash,SHA256_DIGEST_LENGTH);
     printf("Minerador #%d\n", bl->bloco.data[183]);
+    printf("TESTANDO %d\n", contaTransacao(*bl));
+    printf("Numero de transacao %d\n", blockchain->maior_transacao);
     printf("\n----------------------------------------\n");
     
 }
@@ -216,10 +249,13 @@ void imprimeBlockchain(estatistica *blockchain){
 void imprimeLista(estatistica *blockchain){
     if(blockchain == NULL) return;
     PossuiBitcoin *aux=blockchain->Possui;
+    int contador =1;
     while (aux != NULL)
     {
+        printf("CONTADOR %d ", contador);
         printf("%d\n", aux->data);
         aux = aux->prox;
+        contador++;
     }
     
 }
@@ -229,6 +265,7 @@ void imprimeMaisBitcoin(estatistica blockchain){
     PossuiBitcoin *endereco_com_bitcoin = blockchain.Possui;
     unsigned int *carteira = blockchain.monitoraCarteira->endereco;
     unsigned int maior_valor = *(blockchain.monitoraCarteira->endereco);
+
     while (endereco_com_bitcoin)
     {
         if(*(carteira + endereco_com_bitcoin->data) > maior_valor)
@@ -251,7 +288,6 @@ void imprimeMaisBitcoin(estatistica blockchain){
     }
     printf("\n------------------FIM-----------------------------\n");
 }
-
 void imprimeMaisMinerou(estatistica blockchain){
     
     unsigned int maior_quantidade = 0;
@@ -270,14 +306,36 @@ void imprimeMaisMinerou(estatistica blockchain){
 
 }
 void imprimeBlocoMaiorTransacao(estatistica blockchain){
-    BlocoMinerado *bl = blockchain.BlocoMinerado;
-   for(int i =0; i < TOTAL_BLOCOS; i++){
-    printf("%02x",*bl->hash);
-   }
+    BlocoMinerado *bl = blockchain.BlocoMinerado->prox;
+    printf("\n-----------BLOCO COM MAIOR TRANSACAO------------\n");
+    printf("A maior transacao eh: %d\n", blockchain.maior_transacao);
+    for(int i =0; i < TOTAL_BLOCOS; i++){
+        if(blockchain.maior_transacao == contaTransacao(*bl)){
+            printHash(bl->hash, SHA256_DIGEST_LENGTH);
+        }
+        bl = bl->prox;
+    }
+    printf("\n-------FIM DO BLOCO COM MAIOR TRANSACAO--------\n");
+
+    
+}
+void imprimeBlocoMenorTransacao(estatistica blockchain){
+    //esse proximo é para atribuir o inicio da lista circular
+    BlocoMinerado *bl = blockchain.BlocoMinerado->prox;
+    printf("\n-----------BLOCO COM MAIOR TRANSACAO------------\n");
+    printf("A maior transacao eh: %d\n", blockchain.maior_transacao);
+    for(int i =0; i < TOTAL_BLOCOS; i++){
+        if(blockchain.maior_transacao == contaTransacao(*bl)){
+            printHash(bl->hash, SHA256_DIGEST_LENGTH);
+        }
+        bl = bl->prox;
+    }
+    printf("\n-------FIM DO BLOCO COM MAIOR TRANSACAO--------\n");
+
     
 }
 void mediaBitcoin(estatistica blockchain){
-    printf("%.2f", (blockchain.numero_medio_bitcoin / (TOTAL_BLOCOS - INCREMENTO)));
+    printf("%.2f", (blockchain.numero_medio_bitcoin / (TOTAL_BLOCOS - 1)));
 }
 void inicializaBlockchain(estatistica *blockchain){
     blockchain->BlocoMinerado = NULL;
@@ -288,12 +346,17 @@ void inicializaBlockchain(estatistica *blockchain){
     memset(blockchain->minerou_mais_bloco, 0, sizeof(blockchain->minerou_mais_bloco));
 }
 void liberaBlockchain(estatistica *blockchain){
+    if(blockchain == NULL) return;
+
     BlocoMinerado *aux_blN = blockchain->BlocoMinerado;
-    while(aux_blN != NULL){
-        blockchain->BlocoMinerado = blockchain->BlocoMinerado->prox;
+    do
+    {
+        aux_blN = blockchain->BlocoMinerado->prox;
+        blockchain->BlocoMinerado->prox = aux_blN->prox;
         free(aux_blN);
-        aux_blN = blockchain->BlocoMinerado;
-    }
+
+    } while (aux_blN != blockchain->BlocoMinerado);
+    /* free(blockchain->BlocoMinerado); */
     PossuiBitcoin *aux_possui = blockchain->Possui;
     while (aux_possui != NULL)
     {

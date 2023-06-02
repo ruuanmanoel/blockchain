@@ -3,11 +3,12 @@
 int main()
 {
   unsigned char escolha;
-  estatistica *blockchain = malloc(sizeof(estatistica));
+  estatistica *blockchain = criaBlockchain();
   inicializaBlockchain(blockchain);
   CarteiraSistema carteira;
   iniciarCarteira(&carteira);
   gerarBloco(blockchain,&carteira);  
+
 
   printf("Escolha uma das opções abaixo: ");
   scanf("%c",&escolha);
