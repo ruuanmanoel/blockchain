@@ -77,7 +77,7 @@ void iniciarBlockchain(Controller *controle,CarteiraSistema *carteira,MTRand *ra
         minerar(controle,&bloco_nao_minerado);
         recompensa(controle, carteira);
         atualizaCarteira(controle,carteira);
-        //imprimeBloco(*controle);
+        imprimeBloco(*controle->bloco_minerado);
         numero++;
     }
     
