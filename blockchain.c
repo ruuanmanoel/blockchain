@@ -235,7 +235,7 @@ void imprimeBloco(BlocoMinerado bl){
            printf("%d", bl.bloco.data[i]);
         }
     }else{
-        for(int i=0; i <MAX_TRANSACAO+1;i++){
+        for(int i=0; i <70;i++){
            printf("%c", bl.bloco.data[i]);
         }
     }
@@ -243,6 +243,7 @@ void imprimeBloco(BlocoMinerado bl){
     printHash(bl.bloco.hashAnterior,SHA256_DIGEST_LENGTH);
     printf("Hash Atual ");
     printHash(bl.hash,SHA256_DIGEST_LENGTH);
+    printf("Numero de Transacoes %d\n", contaTransacao(bl));
     printf("Minerador #%d\n", bl.bloco.data[183]);
     printf("\n----------------------------------------\n"); 
 }
@@ -264,13 +265,15 @@ void menu(){
     printf("\n-----------MENU------------\n");
     printf("a) Endereco com mais bitcoin e o numero de bitcoin dele \n");
     printf("b) Endereco que minerou mais blocos\n");
-    printf("c) Hash do bloco com mais transações e o numero de transações dele\n ");
+    printf("c) Hash do bloco com mais transações e o numero de transações dele\n");
     printf("d) Hash do bloco com menos transações e o numero de transações dele\n");
     printf("e) Quantidade media de bitcoin por bloco\n");
     printf("f) Imprimir todos os campos de um bloco\n");
     printf("g) Imprimir todos os blocos minerados por um dado endereco\n");
     printf("h) Imprimir todos os campos dos N primeiros bloco\n");
     printf("i) Imprimir todos os campos de um bloco com determinado nonce:\n");
+    printf("0 - para sair\n");
+
     printf("\n-----------Fim DO MENU------------\n");
 
     
@@ -310,6 +313,7 @@ void maiorMinerador(Controller controle){
     printf("\n---------------- FIM  ---------------------\n");
 }
 int contaTransacao(BlocoMinerado bl){
+    if(bl.bloco.numero ==1) return 0;
     unsigned int contador =0;
     for (int i = 1; i < MAX_TRANSACAO; i++)
     {
@@ -378,6 +382,64 @@ void imprimirBloco(Controller controle, unsigned int numero){
     printf("Minerador #%d\n", bl->bloco.data[183]);
     printf("\n----------------------------------------\n"); 
 }
+void imprimirNBlocoMinerador(Controller controle,unsigned char minerador, unsigned int n_bloco ){
+    BlocoMinerado *bl = controle.bloco_minerado;
+    unsigned int contador = 0;
+    do
+    {
+        if(bl->bloco.data[INDICE_MINERADOR]==minerador){
+            imprimeBloco(*bl);
+            contador++;
+        }
+        bl = bl->prox;
+    } while (bl!=controle.bloco_minerado && contador< n_bloco);
+}
+void nBlocosOrdenados(Controller controle, unsigned int num_blocos){
+    BlocoMinerado *bl = controle.bloco_minerado;
+    if(num_blocos > TOTAL_BLOCO)return;
+    unsigned char vetor[num_blocos], minIndex,temp;
+    for(int i= 0; i<num_blocos; i++){
+       bl = bl->prox;  
+     /*   if(bl->bloco.numero == 1){
+        bl = bl->prox;
+       }  */
+       vetor[i] = contaTransacao(*bl);
+       
+    }
+    for (int i = 0; i < num_blocos - 1; i++) {
+        minIndex = i;
+
+        // Encontra o índice do menor elemento no restante do array
+        for (int j = i + 1; j < num_blocos; j++) {
+            if (vetor[j] < vetor[minIndex]) {
+                minIndex = j;
+            }
+        }
+
+        // Troca o elemento mínimo com o elemento na posição atual
+        temp = vetor[i];
+        vetor[i] = vetor[minIndex];
+        vetor[minIndex] = temp;
+    }
+
+    for (size_t i = 0; i < num_blocos; i++)
+    {
+        bl = controle.bloco_minerado->prox;
+/*         if (bl->bloco.numero == 1) bl=bl->prox; */
+        
+        for (size_t j = 0; j < num_blocos; j++)
+        {
+            if(vetor[i] == contaTransacao(*bl)){
+                imprimeBloco(*bl);
+                break;
+            }else{
+                bl = bl->prox;
+            }
+        } 
+    }
+    
+
+}
 void imprimirBlocoPorNonce(Controller controle, unsigned int nonce){
     BlocoMinerado *bl = controle.bloco_minerado;
     do
@@ -388,5 +450,4 @@ void imprimirBlocoPorNonce(Controller controle, unsigned int nonce){
         bl = bl->prox;
     } while (bl!=controle.bloco_minerado);
      
-    
 }

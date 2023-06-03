@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #define NUM_ENDERECO 256
-#define TOTAL_BLOCO 10
+#define TOTAL_BLOCO 1000
 #define TAM_DATA 184
 #define RECOMPENSA 50
 #define MAX_TRANSACAO 61
@@ -86,6 +86,6 @@ void blocoMaisTransacao(Controller controle);
 void blocoMenosTransacao(Controller controle);
 void blocoMediaBitcoin(Controller Controller);
 void imprimirBloco(Controller controle, unsigned int numero);
-void ImprimirNBlocoMinerador();
+void imprimirNBlocoMinerador(Controller controle,unsigned char minerador, unsigned int n_bloco );
 void nBlocosOrdenados();
-void imprimirBlocoPorNonce();
+void imprimirBlocoPorNonce(Controller controle, unsigned int nonce);

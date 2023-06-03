@@ -7,6 +7,7 @@
         "string": "c",
         "string_view": "c",
         "span": "c",
-        "blockchain.h": "c"
+        "blockchain.h": "c",
+        "stdlib.h": "c"
     }
 }
